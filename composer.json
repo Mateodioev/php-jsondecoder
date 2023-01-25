@@ -1,0 +1,15 @@
+{
+    "name": "mateodioev/jsondecoder",
+    "description": "Json decoder, encoder",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mateodioev\\Json\\": "src/",
+			"Types\\": "Types/"
+        }
+    },
+    "require": {
+		"php": ">=8.1"
+	}
+}
