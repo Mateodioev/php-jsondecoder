@@ -8,7 +8,7 @@ composer require mateodioev/jsondecoder
 ```
 
 ```php
-require Mateodioev\Json;
+use Mateodioev\Json;
 ```
 
 ## Usage
