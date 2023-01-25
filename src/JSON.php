@@ -3,7 +3,6 @@
 namespace Mateodioev\Json;
 
 use JsonException;
-use Reflection;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -67,10 +66,14 @@ class JSON
         }
     }
 
-	public function passingAttributes(ReflectionAttribute $attr, $obj, mixed $content)
-	{
+    /**
+     * @throws JsonDecodeException
+     * @throws ReflectionException
+     */
+    public function passingAttributes(ReflectionAttribute $attr, $obj, mixed $content): void
+    {
 		$type = $this->property->getType();
-		$contentType = self::getType($content);
+		$contentType = self::getType($content, true);
 
 		if ($type == 'array' && $contentType != 'array') {
 			throw new JsonDecodeException($this->buildInvalidTypeMessage($contentType));
@@ -133,11 +136,11 @@ class JSON
 
 		if (!$shortType) return $type;
 
-		switch ($type) {
-			case 'boolean': return 'bool';
-			case 'integer': return 'int';
-			case 'double': return 'float';
-			default: return $type;
-		}
+        return match ($type) {
+            'boolean' => 'bool',
+            'integer' => 'int',
+            'double' => 'float',
+            default => $type,
+        };
 	}
 }
