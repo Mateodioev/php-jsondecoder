@@ -5,8 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Mateodioev\\Json\\": "src/",
-			"Types\\": "Types/"
+            "Mateodioev\\Json\\": "src/"
         }
     },
     "require": {
