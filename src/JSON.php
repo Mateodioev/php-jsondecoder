@@ -47,8 +47,8 @@ class JSON
             $type = $this->property->getType();
 			$attr = $this->property->getAttributes()[0] ?? null;
 
-			if ($attr instanceof ReflectionAttribute) {
-				$this->passingAttributes($attr, $obj, $this->json[$name]);
+			if ($attr instanceof ReflectionAttribute && $attr->getName() == JsonField::class) {
+				$this->passingAttributes($attr->newInstance(), $obj, $this->json[$name]);
 				continue;
 			}
 			if ($type->isBuiltin() === false) {
@@ -70,26 +70,33 @@ class JSON
      * @throws JsonDecodeException
      * @throws ReflectionException
      */
-    public function passingAttributes(ReflectionAttribute $attr, $obj, mixed $content): void
+    public function passingAttributes(JsonField $field, $obj, mixed $content): void
     {
-		$type = $this->property->getType();
+
+		// Property type
+		$type = $field->isArray() ? 'array' : $this->property->getType();
 		$contentType = self::getType($content, true);
 
-		if ($type == 'array' && $contentType != 'array') {
+		// Check if json and class property type are the same
+		if ($type != $contentType) {
 			throw new JsonDecodeException($this->buildInvalidTypeMessage($contentType));
-		} elseif ($type == 'array') {
+
+		} elseif ($type == 'array' && $field->isArray()) {
 			$contents     = [];
-			$subClassName = $attr->getName();
+			// Create new instance of class
+			$subClassName = new ($field->class());
 			foreach ($content as $subContent) {
 				$subObj = new $subClassName;
 				(new JSON(\json_encode($subContent)))->decode($subObj);
 
 				$contents[] = $subObj;
+				unset($subObj);
 			}
 
 			$this->property->setValue($obj, $contents);
 		} else {
-			$this->passingNotScalarTypes($obj, $attr->getName(), $content);
+			// Pass singles atribute
+			$this->passingNotScalarTypes($obj, $field->class(), $content);
 		}
 	}
 
