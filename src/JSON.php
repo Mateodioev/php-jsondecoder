@@ -150,4 +150,9 @@ class JSON
             default => $type,
         };
 	}
+
+	public static function new(string $raw): JSON
+	{
+		return new JSON($raw);
+	}
 }
