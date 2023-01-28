@@ -82,12 +82,12 @@ class JSON
 			throw new JsonDecodeException($this->buildInvalidTypeMessage($contentType));
 
 		} elseif ($type == 'array' && $field->isArray()) {
-			$contents     = [];
+			$contents = [];
 			// Create new instance of class
 			$subClassName = new ($field->class());
 			foreach ($content as $subContent) {
 				$subObj = new $subClassName;
-				(new JSON(\json_encode($subContent)))->decode($subObj);
+				JSON::new($subContent)->decode($subObj);
 
 				$contents[] = $subObj;
 				unset($subObj);
