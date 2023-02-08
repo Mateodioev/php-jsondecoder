@@ -22,7 +22,10 @@ $rawJson = '{
 $u = new User;
 
 // Decode JSON string to User object
-JSON::new($rawJson)->decode($u);
+try {
+    JSON::new($rawJson)->decode($u);
+} catch (\Mateodioev\Json\JsonDecodeException|ReflectionException $e) {
+}
 
 
 var_dump($u);

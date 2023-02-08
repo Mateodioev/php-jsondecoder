@@ -31,5 +31,8 @@ $rawJson = '{
 
 $u = new User;
 
-JSON::new($rawJson)->decode($u);
+try {
+    JSON::new($rawJson)->decode($u);
+} catch (\Mateodioev\Json\JsonDecodeException|ReflectionException $e) {
+}
 var_dump($u);

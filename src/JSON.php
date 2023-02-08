@@ -87,7 +87,7 @@ class JSON
 			$subClassName = new ($field->class());
 			foreach ($content as $subContent) {
 				$subObj = new $subClassName;
-				JSON::new($subContent)->decode($subObj);
+				JSON::new(\json_encode($subContent))->decode($subObj);
 
 				$contents[] = $subObj;
 				unset($subObj);
@@ -95,7 +95,7 @@ class JSON
 
 			$this->property->setValue($obj, $contents);
 		} else {
-			// Pass singles atribute
+			// Pass singles attribute
 			$this->passingNotScalarTypes($obj, $field->class(), $content);
 		}
 	}
@@ -151,8 +151,48 @@ class JSON
         };
 	}
 
-	public static function new(string $raw): JSON
+    /**
+     * @throws JsonDecodeException
+     */
+    public static function new(string $raw): JSON
 	{
 		return new JSON($raw);
+	}
+
+    /**
+     * @throws JsonDecodeException
+     * @throws ReflectionException
+     */
+    public static function decodeInClass(string $raw, string $className): object
+	{
+		if (!class_exists($className)) {
+			throw new JsonDecodeException("Class {$className} not found");
+		}
+
+		$object = new $className;
+		self::new($raw)->decode($object);
+		return $object;
+	}
+
+	/**
+	 * Encode class content into array
+	 */
+	public static function encode(object $obj, ?int $filters = ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_READONLY): array
+	{
+		$class = new ReflectionClass($obj);
+		$properties = $class->getProperties($filters);
+		$content = [];
+
+		foreach ($properties as $property) {
+			$type = $property->getType();
+
+			$value = $property->getValue($obj);
+			if (!$type->isBuiltin()) {
+                $value = self::encode($value);
+            }
+            $content[$property->getName()] = $value;
+        }
+
+		return $content;
 	}
 }

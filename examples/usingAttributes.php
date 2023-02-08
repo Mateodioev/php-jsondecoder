@@ -9,7 +9,7 @@ class User {
 	public string $name;
 	public string $username;
 
-	// Using atrribute for arrays
+	// Using attribute for arrays
 	#[Mateodioev\Json\JsonField(Product::class)]
 	public array $product;
 }
