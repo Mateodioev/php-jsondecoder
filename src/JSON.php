@@ -119,8 +119,14 @@ class JSON
     public function passingScalarTypes($obj, mixed $value): void
     {
         $valueType = self::getType($value, true);
+	    
+        $type = $this->property->getType();
 
-        if ($this->property->getType() != $valueType) {
+        if ($type instanceof \ReflectionNamedType) {
+            $type = $type->getName();
+	}
+
+        if ($type != $valueType) {
             throw new JsonDecodeException($this->buildInvalidTypeMessage($valueType));
         }
 
